@@ -1,8 +1,25 @@
 async function getWeather() {
   const city = document.getElementById('city').value;
-  const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=8bc7141bc4cdfb119dd4651d5ef661fc&units=metric`);
-  const data = await res.json();
-  document.getElementById('weatherResult').innerText = `${data.name}: ${data.main.temp}°C, ${data.weather[0].description}`;
+
+  if (!navigator.onLine) {
+    document.getElementById('weatherResult').innerText = '⚠️ Brak internetu. Pogoda nie może zostać pobrana.';
+    return;
+  }
+
+  try {
+    const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=8bc7141bc4cdfb119dd4651d5ef661fc&units=metric`);
+    const data = await res.json();
+
+    if (!data || !data.main) {
+      document.getElementById('weatherResult').innerText = '❌ Nie znaleziono miasta.';
+      return;
+    }
+
+    document.getElementById('weatherResult').innerText = `${data.name}: ${data.main.temp}°C, ${data.weather[0].description}`;
+  } catch (err) {
+    document.getElementById('weatherResult').innerText = '❌ Błąd podczas pobierania danych pogodowych.';
+    console.error(err);
+  }
 }
 
 // IndexedDB
