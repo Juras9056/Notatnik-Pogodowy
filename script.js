@@ -1,6 +1,11 @@
 async function getWeather() {
   const city = document.getElementById('city').value;
 
+  if (!city.trim()) {
+    document.getElementById('weatherResult').innerText = '⚠️ Nie wpisano miasta.';
+    return;
+  }
+
   if (!navigator.onLine) {
     document.getElementById('weatherResult').innerText = '⚠️ Brak internetu. Pogoda nie może zostać pobrana.';
     return;
@@ -11,13 +16,13 @@ async function getWeather() {
     const data = await res.json();
 
     if (!data || !data.main) {
-      document.getElementById('weatherResult').innerText = ' Nie znaleziono miasta.';
+      document.getElementById('weatherResult').innerText = '❌ Nie znaleziono miasta.';
       return;
     }
 
     document.getElementById('weatherResult').innerText = `${data.name}: ${data.main.temp}°C, ${data.weather[0].description}`;
   } catch (err) {
-    document.getElementById('weatherResult').innerText = ' Błąd podczas pobierania danych pogodowych.';
+    document.getElementById('weatherResult').innerText = '❌ Błąd podczas pobierania danych pogodowych.';
     console.error(err);
   }
 }
