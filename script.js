@@ -1,6 +1,6 @@
 async function getWeather() {
   const city = document.getElementById('city').value;
-  const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=YOUR_API_KEY&units=metric`);
+  const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=a98258fdf8dc948a49a8d91bf76dd690&units=metric`);
   const data = await res.json();
   document.getElementById('weatherResult').innerText = `${data.name}: ${data.main.temp}°C, ${data.weather[0].description}`;
 }
