@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notatnik Pogodowy</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Witaj w Notatniku Pogodowym</h1>
+  <nav>
+    <a href="weather.html">Sprawdź pogodę</a>
+    <a href="notes.html">Zapisz notatkę</a>
+  </nav>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log('SW zarejestrowany'))
+        .catch(err => console.error('SW błąd', err));
+    }
+  </script>
+</body>
+</html>
