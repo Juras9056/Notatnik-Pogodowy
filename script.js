@@ -16,30 +16,36 @@ async function getWeather() {
   const timeoutId = setTimeout(() => controller.abort(), 5000);
 
   try {
-    const res = await fetch(url, { signal: controller.signal });
-    clearTimeout(timeoutId);
+  const res = await fetch(url, { signal: controller.signal });
+  clearTimeout(timeoutId);
 
-    if (!res || !res.ok) {
-      if (res.status === 404) {
-        resultBox.innerText = '❌ Nie znaleziono miasta.';
-      } else {
-        resultBox.innerText = '❌ Błąd połączenia z serwerem.';
-      }
-      return;
-    }
-
-    const data = await res.json();
-    if (!data || !data.main || !data.weather || data.cod !== 200) {
-      resultBox.innerText = '❌ Brak danych pogodowych.';
-      return;
-    }
-
-    resultBox.innerText = `${data.name}: ${data.main.temp}°C, ${data.weather[0].description}`;
-  } catch (err) {
-    clearTimeout(timeoutId);
-    resultBox.innerText = '📴 Brak internetu lub serwer nie odpowiada.';
-    console.error('Błąd:', err);
+  if (!res || !res.ok) {
+    resultBox.innerText = res.status === 404
+      ? '❌ Nie znaleziono miasta.'
+      : '❌ Błąd połączenia z serwerem.';
+    return;
   }
+
+  const contentType = res.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    resultBox.innerText = '📴 Brak internetu lub odpowiedź nie jest typu JSON.';
+    return;
+  }
+
+  const data = await res.json();
+
+  if (!data || !data.main || !data.weather || data.cod !== 200) {
+    resultBox.innerText = '❌ Brak danych pogodowych.';
+    return;
+  }
+
+  resultBox.innerText = `${data.name}: ${data.main.temp}°C, ${data.weather[0].description}`;
+} catch (err) {
+  clearTimeout(timeoutId);
+  resultBox.innerText = '📴 Brak internetu lub serwer nie odpowiada.';
+  console.error('Błąd:', err);
+}
+
 }
 
 // IndexedDB
