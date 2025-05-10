@@ -1,29 +1,43 @@
 async function getWeather() {
-  const city = document.getElementById('city').value;
+  const cityInput = document.getElementById('city');
+  const resultBox = document.getElementById('weatherResult');
 
-  if (!city.trim()) {
-    document.getElementById('weatherResult').innerText = '⚠️ Nie wpisano miasta.';
+  if (!cityInput || !resultBox) {
+    console.error("Brakuje elementu input lub result.");
+    return;
+  }
+
+  const city = cityInput.value.trim();
+
+  if (city === '') {
+    resultBox.innerText = '⚠️ Nie wpisano miasta.';
     return;
   }
 
   if (!navigator.onLine) {
-    document.getElementById('weatherResult').innerText = '⚠️ Brak internetu. Pogoda nie może zostać pobrana.';
+    resultBox.innerText = '⚠️ Brak internetu. Pogoda nie może zostać pobrana.';
     return;
   }
 
   try {
     const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=8bc7141bc4cdfb119dd4651d5ef661fc&units=metric`);
-    const data = await res.json();
 
-    if (!data || !data.main) {
-      document.getElementById('weatherResult').innerText = '❌ Nie znaleziono miasta.';
+    if (!res.ok) {
+      resultBox.innerText = '❌ Nie znaleziono miasta lub wystąpił błąd serwera.';
       return;
     }
 
-    document.getElementById('weatherResult').innerText = `${data.name}: ${data.main.temp}°C, ${data.weather[0].description}`;
+    const data = await res.json();
+
+    if (!data || !data.main || !data.weather || data.cod !== 200) {
+      resultBox.innerText = '❌ Nie można znaleźć danych pogodowych dla podanego miasta.';
+      return;
+    }
+
+    resultBox.innerText = `${data.name}: ${data.main.temp}°C, ${data.weather[0].description}`;
   } catch (err) {
-    document.getElementById('weatherResult').innerText = '❌ Błąd podczas pobierania danych pogodowych.';
-    console.error(err);
+    console.error('Błąd fetch:', err);
+    resultBox.innerText = '❌ Błąd podczas pobierania danych pogodowych.';
   }
 }
 
