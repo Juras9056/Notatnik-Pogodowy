@@ -2,42 +2,43 @@ async function getWeather() {
   const cityInput = document.getElementById('city');
   const resultBox = document.getElementById('weatherResult');
 
-  if (!cityInput || !resultBox) {
-    console.error("Brakuje elementu input lub result.");
-    return;
-  }
+  if (!cityInput || !resultBox) return;
 
   const city = cityInput.value.trim();
-
-  if (city === '') {
+  if (!city) {
     resultBox.innerText = '⚠️ Nie wpisano miasta.';
     return;
   }
 
-  if (!navigator.onLine) {
-    resultBox.innerText = '⚠️ Brak internetu. Pogoda nie może zostać pobrana.';
-    return;
-  }
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=8bc7141bc4cdfb119dd4651d5ef661fc&units=metric`;
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
 
   try {
-    const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=8bc7141bc4cdfb119dd4651d5ef661fc&units=metric`);
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
 
-    if (!res.ok) {
-      resultBox.innerText = '❌ Nie znaleziono miasta lub wystąpił błąd serwera.';
+    if (!res || !res.ok) {
+      if (res.status === 404) {
+        resultBox.innerText = '❌ Nie znaleziono miasta.';
+      } else {
+        resultBox.innerText = '❌ Błąd połączenia z serwerem.';
+      }
       return;
     }
 
     const data = await res.json();
-
     if (!data || !data.main || !data.weather || data.cod !== 200) {
-      resultBox.innerText = '❌ Nie można znaleźć danych pogodowych dla podanego miasta.';
+      resultBox.innerText = '❌ Brak danych pogodowych.';
       return;
     }
 
     resultBox.innerText = `${data.name}: ${data.main.temp}°C, ${data.weather[0].description}`;
   } catch (err) {
-    console.error('Błąd fetch:', err);
-    resultBox.innerText = '❌ Błąd podczas pobierania danych pogodowych.';
+    clearTimeout(timeoutId);
+    resultBox.innerText = '📴 Brak internetu lub serwer nie odpowiada.';
+    console.error('Błąd:', err);
   }
 }
 
