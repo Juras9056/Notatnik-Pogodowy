@@ -1,23 +1,47 @@
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open('app-cache').then(cache => {
-      return cache.addAll([
-        '/',
-        '/index.html',
-        '/weather.html',
-        '/notes.html',
-        '/style.css',
-        '/script.js',
-        '/manifest.json'
-      ]);
-    })
+const CACHE_NAME = 'notatnik-pwa-v1';
+const urlsToCache = [
+  '/Notatnik-Pogodowy/',
+  '/Notatnik-Pogodowy/index.html',
+  '/Notatnik-Pogodowy/weather.html',
+  '/Notatnik-Pogodowy/notes.html',
+  '/Notatnik-Pogodowy/style.css',
+  '/Notatnik-Pogodowy/script.js',
+  '/Notatnik-Pogodowy/manifest.json',
+  '/Notatnik-Pogodowy/icons/icon-192.png',
+  '/Notatnik-Pogodowy/icons/icon-512.png'
+];
+
+// Instalacja Service Workera i cache'owanie plików
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        console.log('📦 Caching files');
+        return cache.addAll(urlsToCache);
+      })
   );
 });
 
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then(resp => {
-      return resp || fetch(e.request);
-    })
+// Obsługa fetch - cache-first
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        return response || fetch(event.request);
+      }).catch(() => {
+        return caches.match('/Notatnik-Pogodowy/index.html');
+      })
+  );
+});
+
+// Opcjonalne czyszczenie starego cache'a
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.filter(key => key !== CACHE_NAME)
+            .map(key => caches.delete(key))
+      )
+    )
   );
 });
