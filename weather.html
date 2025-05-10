@@ -13,13 +13,16 @@
   <div id="weatherResult"></div>
   <a href="index.html">← Powrót</a>
 
-  <script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
     if (!navigator.onLine) {
-      document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('weatherResult').innerText = '⚠️ Brak internetu. Nie można pobrać danych pogodowych.';
-      });
+      const result = document.getElementById('weatherResult');
+      if (result) {
+        result.innerText = '⚠️ Brak internetu. Nie można pobrać danych pogodowych.';
+      }
     }
-  </script>
+  });
+</script>
   <script src="script.js"></script>
 </body>
 </html>
