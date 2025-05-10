@@ -12,6 +12,14 @@
   <button onclick="getWeather()">Pobierz pogodę</button>
   <div id="weatherResult"></div>
   <a href="index.html">← Powrót</a>
+
+  <script>
+    if (!navigator.onLine) {
+      document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('weatherResult').innerText = '⚠️ Brak internetu. Nie można pobrać danych pogodowych.';
+      });
+    }
+  </script>
   <script src="script.js"></script>
 </body>
 </html>
